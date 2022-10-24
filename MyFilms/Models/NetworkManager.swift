@@ -40,6 +40,7 @@ struct NetworkManager {
         
         let decoder = JSONDecoder()
         do {
+            //decoder.keyDecodingStrategy = .useDefaultKeys
             let foundFilmsData = try decoder.decode(FoundFilmsData.self, from: data)
             print(foundFilmsData.films[0].nameRu)
         } catch let error as NSError {
@@ -47,7 +48,8 @@ struct NetworkManager {
 //            let actionOk = UIAlertAction(title: "OK", style: .default)
 //            alertController.addAction(actionOk)
 //            present
-            print(error.localizedDescription)
+            //print(error.localizedDescription)
+            print(error)
         }
         
     }
