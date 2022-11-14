@@ -6,25 +6,27 @@
 //
 
 import Foundation
+import UIKit
 
 // MARK: - FoundFilmsData
 struct FoundFilmsData: Codable {
     let keyword: String
     let pagesCount: Int
-    let films: [Film]
+    let films: [Film]?
     let searchFilmsCountResult: Int
 }
 
 // MARK: - Film
 struct Film: Codable {
-    let filmID: Int
-    let nameRu, type, year, filmDescription: String
+    let filmID: Int?
+    let nameRu, type, year: String?
+    let filmDescription: String?
     let filmLength: String?
-    let countries: [Country]
-    let genres: [Genre]
-    let rating: String
-    let ratingVoteCount: Int
-    let posterURL, posterURLPreview: String
+    let countries: [Country]?
+    let genres: [Genre]?
+    let rating: String?
+    let ratingVoteCount: Int?
+    let posterURL, posterURLPreview: String?
 
     enum CodingKeys: String, CodingKey {
         case filmID = "filmId"
