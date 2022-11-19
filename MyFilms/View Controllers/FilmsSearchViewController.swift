@@ -16,7 +16,9 @@ class ResultsVC: UIViewController {
 
 class FilmsSearchViewController: UITableViewController, UISearchResultsUpdating {
     
+    var networkManager = NetworkManager()
     var films: [Film] = []
+    var filmModels: [FilmModel] = []
     let searchController = UISearchController(searchResultsController: nil)//ResultsVC())
     
     override func viewDidLoad() {
@@ -29,8 +31,15 @@ class FilmsSearchViewController: UITableViewController, UISearchResultsUpdating 
     func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text else { return }
         guard !text.isEmpty else { return }
-        fetchData(byName: text) { [unowned self] (films: [Film]) in
-            self.films = films
+//        fetchData(byName: text) { [unowned self] (films: [Film]) in
+//            self.films = films
+//            DispatchQueue.main.async {
+//                self.tableView.reloadData()
+//            }
+//        }
+        
+        networkManager.fetchData(byName: text) { [unowned self] (filmModels: [FilmModel]) in
+            self.filmModels = filmModels
             DispatchQueue.main.async {
                 self.tableView.reloadData()
             }
@@ -47,7 +56,8 @@ class FilmsSearchViewController: UITableViewController, UISearchResultsUpdating 
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return films.count
+        //return films.count
+        return filmModels.count
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -81,14 +91,16 @@ class FilmsSearchViewController: UITableViewController, UISearchResultsUpdating 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! FoundedFilmCell
-        let currentFilm = films[indexPath.row]
+        //let currentFilm = films[indexPath.row]
+        let currentFilm = filmModels[indexPath.row]
         let genresArray = currentFilm.genres
         let stringGenres = FilmsSearchViewController.getGenresArrayAsString(array: genresArray ?? [])
         cell.filmName.text = currentFilm.nameRu! + " (" + currentFilm.year! + ")"
         cell.filmGenres.text = stringGenres
         cell.filmRating.text = currentFilm.rating ?? "Рейтинг отсутствует"
         cell.filmRating.textColor = FilmsSearchViewController.getColorForRating(rating: currentFilm.rating ?? "")
-        guard let urlString = currentFilm.posterURLPreview else { return cell }
+
+        guard let urlString = currentFilm.stringImagePreviewData else { return cell }
 
         if !urlString.isEmpty {
             guard let url = URL(string: urlString) else { return cell }
@@ -102,6 +114,8 @@ class FilmsSearchViewController: UITableViewController, UISearchResultsUpdating 
 
             }.resume()
         }
+        
+        //cell.filmImage.image = currentFilm.imagePreviewData
         
         return cell
     }
@@ -146,7 +160,7 @@ class FilmsSearchViewController: UITableViewController, UISearchResultsUpdating 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showFilm" {
             guard let indexPath = tableView.indexPathForSelectedRow else { return }
-            let film = films[indexPath.row]
+            let film = filmModels[indexPath.row]
             let filmVC = segue.destination as! FoundedFilmDetailsViewController
             filmVC.currentFilm = film
         }

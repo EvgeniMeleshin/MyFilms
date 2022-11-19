@@ -16,7 +16,7 @@ class FoundedFilmDetailsViewController: UIViewController {
     @IBOutlet weak var filmRating: UILabel!
     @IBOutlet weak var filmGenres: UILabel!
     
-    var currentFilm: Film?
+    var currentFilm: FilmModel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,7 +30,7 @@ class FoundedFilmDetailsViewController: UIViewController {
         filmRating.textColor = FilmsSearchViewController.getColorForRating(rating: currentFilm?.rating ?? "")
         filmGenres.text = FilmsSearchViewController.getGenresArrayAsString(array: currentFilm?.genres ?? [])
         filmDescription.text = currentFilm?.filmDescription ?? ""
-        setFilmImage(urlString: (currentFilm?.posterURL)!)
+        setFilmImage(urlString: (currentFilm?.stringImageData)!)
 
     }
     
@@ -54,7 +54,7 @@ class FoundedFilmDetailsViewController: UIViewController {
         let context = appDelegate.persistentContainer.viewContext
         guard let entity = NSEntityDescription.entity(forEntityName: "FilmStorage", in: context) else { return }
         let filmObject = FilmStorage(entity: entity, insertInto: context)
-        filmObject.name = filmName.text
+        filmObject.nameRu = filmName.text
         filmObject.date = .now
         
         do {
@@ -69,7 +69,7 @@ class FoundedFilmDetailsViewController: UIViewController {
         let alert = UIAlertController(title: "", message: "Added to my films", preferredStyle: .alert)
         alert.view.tintColor = UIColor.systemGreen
         self.present(alert, animated: true, completion: nil)
-        let when = DispatchTime.now() + 2
+        let when = DispatchTime.now() + 1
         DispatchQueue.main.asyncAfter(deadline: when){
           alert.dismiss(animated: true, completion: nil)
         }

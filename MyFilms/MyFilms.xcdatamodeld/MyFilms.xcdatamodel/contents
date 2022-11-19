@@ -3,10 +3,10 @@
     <entity name="FilmStorage" representedClassName="FilmStorage" syncable="YES" codeGenerationType="class">
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="genres" optional="YES" attributeType="String"/>
-        <attribute name="imageData" optional="YES" attributeType="Binary"/>
-        <attribute name="imagePreviewData" optional="YES" attributeType="Binary"/>
+        <attribute name="imageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="imagePreviewData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="myRating" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="nameRu" optional="YES" attributeType="String"/>
         <attribute name="rating" optional="YES" attributeType="String"/>
         <attribute name="year" optional="YES" attributeType="String"/>
     </entity>
