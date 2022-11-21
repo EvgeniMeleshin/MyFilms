@@ -8,33 +8,41 @@
 import UIKit
 import CoreData
 
-class FoundedFilmDetailsViewController: UIViewController {
+class DetailsViewController: UIViewController {
 
     @IBOutlet weak var filmImage: UIImageView!
     @IBOutlet weak var filmName: UILabel!
     @IBOutlet weak var filmDescription: UILabel!
     @IBOutlet weak var filmRating: UILabel!
     @IBOutlet weak var filmGenres: UILabel!
+    @IBOutlet weak var saveButton: UIButton!
     
     var currentFilm: FilmModel?
+    var alreadyAdded: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         guard currentFilm != nil else { return }
-        
-        filmName.text = (currentFilm?.nameRu)! + " (" + (currentFilm?.year)! + ")"
-        
+        guard let nameRu = currentFilm?.nameRu, let year = currentFilm?.year else { return }
+        filmName.text = nameRu + " (\(year))"
         let rating = currentFilm?.rating ?? "Рейтинг отсутствует"
         filmRating.text = rating == "null" ? "Рейтинг отсутствует" : rating
-        filmRating.textColor = FilmsSearchViewController.getColorForRating(rating: currentFilm?.rating ?? "")
-        filmGenres.text = FilmsSearchViewController.getGenresArrayAsString(array: currentFilm?.genres ?? [])
+        filmRating.textColor = SearchFilmsViewController.getColorForRating(rating: currentFilm?.rating ?? "")
+        filmGenres.text = SearchFilmsViewController.getGenresArrayAsString(array: currentFilm?.genres ?? [])
         filmDescription.text = currentFilm?.filmDescription ?? ""
-        setFilmImage(urlString: (currentFilm?.stringImageData)!)
+        
+        if alreadyAdded {
+            filmImage.image = currentFilm?.imageData
+            saveButton.isHidden = true
+            
+        } else {
+            guard let stringImageData = currentFilm?.stringImageData else { return }
+            setFilmImage(urlString: stringImageData)
+        }
 
     }
     
-    func setFilmImage(urlString: String) {
+    private func setFilmImage(urlString: String) {
         if !urlString.isEmpty {
             guard let url = URL(string: urlString) else { return }
             let session = URLSession.shared
@@ -50,12 +58,21 @@ class FoundedFilmDetailsViewController: UIViewController {
     }
     
     @IBAction func saveToMyFilms(_ sender: UIButton) {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
-        guard let entity = NSEntityDescription.entity(forEntityName: "FilmStorage", in: context) else { return }
-        let filmObject = FilmStorage(entity: entity, insertInto: context)
-        filmObject.nameRu = filmName.text
-        filmObject.date = .now
+        let appDelegate             = UIApplication.shared.delegate as! AppDelegate
+        let context                 = appDelegate.persistentContainer.viewContext
+        guard let entity            = NSEntityDescription.entity(forEntityName: "FilmStorage", in: context) else { return }
+        let filmObject              = FilmStorage(entity: entity, insertInto: context)
+        if let filmId = currentFilm?.filmId {
+            filmObject.filmId       = Int32(filmId)
+        }
+        
+        filmObject.nameRu           = currentFilm?.nameRu
+        filmObject.genres           = SearchFilmsViewController.getGenresArrayAsString(array: currentFilm?.genres ?? [])
+        filmObject.rating           = currentFilm?.rating
+        filmObject.year             = currentFilm?.year
+        filmObject.filmDescription  = currentFilm?.filmDescription
+        filmObject.imageData        = filmImage.image?.pngData()
+        filmObject.date             = .now
         
         do {
             try context.save()
@@ -65,7 +82,7 @@ class FoundedFilmDetailsViewController: UIViewController {
         }
     }
     
-    func showMessage() {
+    private func showMessage() {
         let alert = UIAlertController(title: "", message: "Added to my films", preferredStyle: .alert)
         alert.view.tintColor = UIColor.systemGreen
         self.present(alert, animated: true, completion: nil)

@@ -8,7 +8,13 @@
 import Foundation
 import UIKit
 
-class NetworkManager {
+protocol NetworkManagerProtocol {
+    
+    func fetchData(byName filmName: String, completion: @escaping ([FilmModel]) -> ())
+    
+}
+
+class NetworkManager: NetworkManagerProtocol {
   
     var filmModel: FilmModel?
     var filmModels: [FilmModel] = []
@@ -39,9 +45,6 @@ class NetworkManager {
                     filmModels.removeAll()
                     for film in foundedFilms {
                         createNewFilmModel(film: film)
-                        //createFilmModels(film: film)
-//                        var filmModel = FilmModel(film: film, imageData: imageData ?? UIImage(), imagePreviewData: imagePreviewData ?? UIImage())
-//                        filmModels.append(filmModel)
                     }
                     completion(filmModels)
                     
@@ -56,8 +59,6 @@ class NetworkManager {
     
     func createFilmModels(film: Film) {
         
-        //let queue = DispatchQueue.global(qos: .utility)
-        //let queue = DispatchQueue(label: "test", attributes: .concurrent)
         let group = DispatchGroup()
         
         if let url = URL(string: film.posterURL!) {
@@ -159,3 +160,4 @@ class NetworkManager {
     }
 
 }
+
