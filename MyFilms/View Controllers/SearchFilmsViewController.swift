@@ -44,6 +44,14 @@ class SearchFilmsViewController: UIViewController, UITableViewDataSource, UITabl
         navigationItem.searchController = searchController
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        UIView.performWithoutAnimation {
+                searchController.isActive = true
+                searchController.isActive = false
+            }
+    }
+    
     internal func updateSearchResults(for searchController: UISearchController) {
         guard let text = searchController.searchBar.text else { return }
         guard !text.isEmpty else { return }
